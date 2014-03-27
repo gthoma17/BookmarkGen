@@ -1,4 +1,5 @@
-#128_selector{ display:none;
-}
-#16_selector{ display:none;
+.left{
+	width: 180px;
+	float: right;
+	text-align:right;
 }
