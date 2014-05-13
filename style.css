@@ -30,6 +30,18 @@ body {
 	padding-top: 20px;
 }
 
+#what-next{
+	width:50%;
+	border:2px 
+	solid #a1a1a1;
+	padding:10px 40px; 
+	background:#dddddd;border-radius:25px;
+	position:relative;
+    height:auto;
+    left:25%;
+    right:25%;
+}
+
 td > div > input{
 	padding-top: -6px;
 }
