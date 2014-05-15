@@ -136,3 +136,45 @@ function fileHandler128 (e) {
 		}
 	}
 }
+
+function page_init() {
+	//post load setup
+	//setup 16x16 image uploader
+	var input16 = document.getElementById('inputId16')
+	var upImg16 = document.getElementById('imgId16');
+	input16.onchange = function (e) {
+	    loadFileFromInput(e.target,'dataurl');
+	};
+	//setup 128x128 image uploader
+	var input128 = document.getElementById('inputId128')
+	var upImg128 = document.getElementById('imgId128');
+	input128.onchange = function (e) {
+	    loadFileFromInput(e.target,'dataurl');
+	};
+	
+	//create upload event listeners
+	input16.addEventListener('fileLoaded',fileHandler16)
+	input128.addEventListener('fileLoaded',fileHandler128)
+	//setup image picker
+	$("select").imagepicker()
+	//setup uniform
+	$("input").uniform();
+	$("input").not("#run").uniform();
+	//set initial values
+	document.getElementById("app-name").value = "My Super Awesome App";
+	document.getElementById("app-link").value = "http://MySuperAwesomeWebsite.com";
+	//initialize run button
+	var runButton = document.getElementById("run");
+	runButton.onclick = appGen;
+
+
+	//google analytics stuff
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	
+	  ga('create', 'UA-49432939-1', 'appmaker.im');
+	  ga('send', 'pageview');
+
+}
