@@ -3,28 +3,66 @@ function appGen() {
 	var zip = new JSZip();
 	appName = document.getElementById("app-name").value;
 	appLink = document.getElementById("app-link").value;
+	applicationHtml = ""
+	applicationCss = ""
+	applicationJs = ""
+	backgroundJs = ""
 
 	//build files
+
+	//background.js
+	backgroundJs = "chrome.app.runtime.onLaunched.addListener(function() {var options = {'id': '" + appName + "','bounds': {'width': 1024,'height': 768}};chrome.app.window.create('application.html', (options));});";
+
+	//manifest.json
+	manifestJson = "{\"update_url\": \"https://clients2.google.com/service/update2/crx\",\"name\": \"" + appName + "\",\"version\": \"1.0\",\"manifest_version\": 2,\"icons\": {\"128\": \"icon_128.png\",\"16\": \"icon_16.png\"},\"app\": {\"background\": {\"scripts\": [ \"background.js\" ],\"persistent\": false}},\"permissions\": [\"webview\"]";
 	if (document.getElementById('kioskMode').checked) {
-		manifestJson = "{\"update_url\": \"https://clients2.google.com/service/update2/crx\",\"name\": \"" + appName + "\",\"version\": \"1.0\",\"manifest_version\": 2,\"icons\": {\"128\": \"icon_128.png\",\"16\": \"icon_16.png\"},\"app\": {\"background\": {\"scripts\": [ \"background.js\" ],\"persistent\": false}},\"permissions\": [\"webview\"],\"kiosk_enabled\":true}";
+		manifestJson = manifestJson + ",\"kiosk_enabled\":true}";
 	}
 	else{
-		manifestJson = "{\"update_url\": \"https://clients2.google.com/service/update2/crx\",\"name\": \"" + appName + "\",\"version\": \"1.0\",\"manifest_version\": 2,\"icons\": {\"128\": \"icon_128.png\",\"16\": \"icon_16.png\"},\"app\": {\"background\": {\"scripts\": [ \"background.js\" ],\"persistent\": false}},\"permissions\": [\"webview\"]}";
+		manifestJson = manifestJson + "}";
 	}
-	if (document.getElementById('NavButtons').checked) {
-		applicationHtml = "<!DOCTYPE html><html><head><link rel=\"stylesheet\" href=\"application.css\"><script src=\"application.js\"></scr" + "ipt><body><div id=\"controls\"><button id=\"back\" title=\"Go Back\">&#9664;</button><button id=\"forward\" title=\"Go Forward\">&#9654;</button><button id=\"home\" title=\"Go Home\">&#8962;</button><button id=\"reload\" title=\"Reload\">&#10227;</button><button id=\"reset\">Log Off</button><form id=\"location-form\"><div id=\"center-column\"></div></form></div><webview src=\"" + appLink + "\" style=\"width:100%; height:100%\"></webview><div id=\"sad-webview\"><div id=\"sad-webview-icon\">&#9762;</div><h2 id=\"crashed-label\">Aw, Snap!</h2><h2 id=\"killed-label\">He's Dead, Jim!</h2><p>Something went wrong while displaying this webpage.      To continue, reload or go to another page.</p></div></body></html>"
-		applicationCss = "body {  margin: 0;  padding: 0;  font-family: Lucida Grande, Arial, sans-serif;}#controls {  padding: 3px;  border-bottom: solid 1px #ccc;}#controls button,#controls input {  font-size: 14px;  line-height: 24px;  border-radius: 2px;  padding: 0 6px;}button,input[type=\"submit\"],button[disabled]:hover {  border: solid 1px transparent;  background: transparent;}button:hover,input[type=\"submit\"]:hover {  border-color: #ccc;  background: -webkit-linear-gradient(top, #f2f2f2 0%, #cccccc 99%);}/* These glyphs are on the small side, make them look more natural whencompared to the back/forward buttons */#controls #home,#controls #terminate {  font-size: 24px;}#controls #reload {  font-size: 20px;}#location {  border: solid 1px #ccc;  padding: 2px;  width: 100%;  -webkit-box-sizing: border-box;}#controls {  display: -webkit-flex;  -webit-flex-direction: column;}#controls #location-form {  -webkit-flex: 1;  display: -webkit-flex;  -webit-flex-direction: column;}#controls #center-column {  -webkit-flex: 1;}#sad-webview,webview {  position: absolute;  bottom: 0;  left: 0;}/* The reload button turns into a spinning trobber */.loading #reload {  -webkit-animation: spinner-animation .5s infinite linear;  -webkit-transform-origin: 50% 55.5%;}@-webkit-keyframes spinner-animation {  0% { -webkit-transform: rotate(0deg); }  100% {-webkit-transform: rotate(360deg); }} #sad-webview,.exited webview {  visibility: hidden;  visibility: hidden;}.exited #sad-webview {  visibility: visible;  background: #343f51;  text-align: center;  color: #fff;}#sad-webview h2 {  font-size: 14px;}#sad-webview p {  font-size: 11px;}#sad-webview-icon {  font-size: 96px;  margin-bottom: 10px;}/* Variant of the crashed page when the process is intentionally killed (in thatcase we use a different background color and label). */.exited #sad-webview #killed-label {  display: none;}.killed #sad-webview {  background: #393058;}.killed #sad-webview #killed-label {  display: block;}.killed #sad-webview #crashed-label {  display: none;}"
-		applicationJs = "window.onresize = doLayout;var isLoading = false;onload = function() {  var webview = document.querySelector('webview');  doLayout();  document.querySelector('#back').onclick = function() {    webview.back();  };  document.querySelector('#forward').onclick = function() {    webview.forward();  };    document.querySelector('#reset').onclick = function() {    window.close();  };  document.querySelector('#home').onclick = function() {    navigateTo('http://lpps.info');  };    document.querySelector('#reload').onclick = function() {    if (isLoading) {      webview.stop();    } else {      webview.reload();    }  };  document.querySelector('#reload').addEventListener(    'webkitAnimationIteration',    function() {      if (!isLoading) {        document.body.classList.remove('loading');      }    });  document.querySelector('#terminate').onclick = function() {    webview.terminate();  };  document.querySelector('#location-form').onsubmit = function(e) {    e.preventDefault();    navigateTo(document.querySelector('#location').value);  };  webview.addEventListener('exit', handleExit);  webview.addEventListener('loadstart', handleLoadStart);  webview.addEventListener('loadstop', handleLoadStop);  webview.addEventListener('loadabort', handleLoadAbort);  webview.addEventListener('loadredirect', handleLoadRedirect);  webview.addEventListener('loadcommit', handleLoadCommit);};function navigateTo(url) {  resetExitedState();  document.querySelector('webview').src = url;}function doLayout() {  var webview = document.querySelector('webview');  var controls = document.querySelector('#controls');  var controlsHeight = controls.offsetHeight;  var windowWidth = document.documentElement.clientWidth;  var windowHeight = document.documentElement.clientHeight;  var webviewWidth = windowWidth;  var webviewHeight = windowHeight - controlsHeight;  webview.style.width = webviewWidth + 'px';  webview.style.height = webviewHeight + 'px';  var sadWebview = document.querySelector('#sad-webview');  sadWebview.style.width = webviewWidth + 'px';  sadWebview.style.height = webviewHeight * 2/3 + 'px';  sadWebview.style.paddingTop = webviewHeight/3 + 'px';}function handleExit(event) {  console.log(event.type);  document.body.classList.add('exited');  if (event.type == 'abnormal') {    document.body.classList.add('crashed');  } else if (event.type == 'killed') {    document.body.classList.add('killed');  }}function resetExitedState() {  document.body.classList.remove('exited');  document.body.classList.remove('crashed');  document.body.classList.remove('killed');}function handleLoadCommit(event) {  resetExitedState();  if (!event.isTopLevel) {    return;  }  document.querySelector('#location').value = event.url;  var webview = document.querySelector('webview');  document.querySelector('#back').disabled = !webview.canGoBack();  document.querySelector('#forward').disabled = !webview.canGoForward();}function handleLoadStart(event) {  document.body.classList.add('loading');  isLoading = true;  resetExitedState();  if (!event.isTopLevel) {    return;  }  document.querySelector('#location').value = event.url;}function handleLoadStop(event) {isLoading = false;}function handleLoadAbort(event) {  console.log('oadAbort');  console.log('  url: ' + event.url);  console.log('  isTopLevel: ' + event.isTopLevel);  console.log('  type: ' + event.type);}function handleLoadRedirect(event) {  resetExitedState();  if (!event.isTopLevel) {    return;  }  document.querySelector('#location').value = event.newUrl;}"
-	}
-	else if(document.getElementById('logoutButton').checked){
-		applicationHtml = "<!DOCTYPE html><html><head><meta charset='utf-8'><title>" + appName + "</title><script src=\"application.js\"></scr" + "ipt><link rel=\"stylesheet\" type=\"text/css\" href=\"application.css\"></head><body><webview id=\"map\" src=\"" + appLink + "\"></webview><button id=\"reset\">Log Out</button></body></html>"
-		applicationCss = "webview {height: 100%;width: 100%;}button {> left: auto;position: absolute;right: 6px;}";	
-		applicationJs = "window.onload = function() {document.querySelector(\'#reset\').onclick = function() {window.close();};}";
+
+	//application.html, application.js
+	if (document.getElementById('tab').checked) {
+		applicationHtml = "<!DOCTYPE html><html><head><script src=\"application.js\"></script></head><body></body></html>"
+		applicationJs = "window.open(\'" + appLink + "\');window.close();"
 	}
 	else{
-		applicationHtml = "<!DOCTYPE html><html><head><meta charset='utf-8'><title>" + appName + "</title><script src=\"application.js\"></scr" + "ipt><link rel=\"stylesheet\" type=\"text/css\" href=\"application.css\"></head><body><webview id=\"map\" src=\"" + appLink + "\"></webview></body></html>"
-		applicationCss = "webview {height: 100%;width: 100%;}"
-		applicationJs = ""
+		if (document.getElementById('closeButton').checked || document.getElementById('historyButtons').checked || document.getElementById('refreshButton').checked || document.getElementById('addressBar').checked || document.getElementById('homeButton').checked) {
+			applicationHtml = "<!DOCTYPE html><html><head><link rel=\"stylesheet\" href=\"application.css\"><script src=\"application.js\"></scr" + "ipt><body><div id=\"controls\">"	
+			applicationCss = "body {  margin: 0;  padding: 0;  font-family: Lucida Grande, Arial, sans-serif;}#controls {  padding: 3px;  border-bottom: solid 1px #ccc;}#controls button,#controls input {  font-size: 14px;  line-height: 24px;  border-radius: 2px;  padding: 0 6px;}button,input[type=\"submit\"],button[disabled]:hover {  border: solid 1px transparent;  background: transparent;}button:hover,input[type=\"submit\"]:hover {  border-color: #ccc;  background: -webkit-linear-gradient(top, #f2f2f2 0%, #cccccc 99%);}/* These glyphs are on the small side, make them look more natural whencompared to the back/forward buttons */#controls #home,#controls #terminate {  font-size: 24px;}#controls #reload {  font-size: 20px;}#location {  border: solid 1px #ccc;  padding: 2px;  width: 100%;  -webkit-box-sizing: border-box;}#controls {  display: -webkit-flex;  -webit-flex-direction: column;}#controls #location-form {  -webkit-flex: 1;  display: -webkit-flex;  -webit-flex-direction: column;}#controls #center-column {  -webkit-flex: 1;}#sad-webview,webview {  position: absolute;  bottom: 0;  left: 0;}/* The reload button turns into a spinning trobber */.loading #reload {  -webkit-animation: spinner-animation .5s infinite linear;  -webkit-transform-origin: 50% 55.5%;}@-webkit-keyframes spinner-animation {  0% { -webkit-transform: rotate(0deg); }  100% {-webkit-transform: rotate(360deg); }} #sad-webview,.exited webview {  visibility: hidden;  visibility: hidden;}.exited #sad-webview {  visibility: visible;  background: #343f51;  text-align: center;  color: #fff;}#sad-webview h2 {  font-size: 14px;}#sad-webview p {  font-size: 11px;}#sad-webview-icon {  font-size: 96px;  margin-bottom: 10px;}/* Variant of the crashed page when the process is intentionally killed (in thatcase we use a different background color and label). */.exited #sad-webview #killed-label {  display: none;}.killed #sad-webview {  background: #393058;}.killed #sad-webview #killed-label {  display: block;}.killed #sad-webview #crashed-label {  display: none;}"
+			applicationJs = "window.onresize = doLayout;var isLoading = false;onload = function() {  var webview = document.querySelector('webview');  doLayout();  "
+			
+			if (document.getElementById('historyButtons').checked) {
+				applicationHtml = applicationHtml + "<button id=\"back\" title=\"Go Back\">&#9664;</button><button id=\"forward\" title=\"Go Forward\">&#9654;</button>";
+				applicationJs = applicationJs + "document.querySelector('#back').onclick = function() {    webview.back();  };  document.querySelector('#forward').onclick = function() {    webview.forward();  };    "
+			};
+			if (document.getElementById('homeButton').checked) {
+				applicationHtml = applicationHtml + "<button id=\"home\" title=\"Go Home\">&#8962;</button>"
+				applicationJs = applicationJs + "document.querySelector('#home').onclick = function() {    navigateTo(\'" + appLink + "\');  };    "
+			};
+			if (document.getElementById('refreshButton').checked) {
+				applicationHtml = applicationHtml + "<button id=\"reload\" title=\"Reload\">&#10227;</button>"
+				applicationJs = applicationJs + "document.querySelector('#reload').onclick = function() {    if (isLoading) {      webview.stop();    } else {      webview.reload();    }  };  document.querySelector('#reload').addEventListener(    'webkitAnimationIteration',    function() {      if (!isLoading) {        document.body.classList.remove('loading');      }    });  "
+			};
+			if (document.getElementById('closeButton').checked) {
+				applicationHtml = applicationHtml + "<button id=\"reset\">Close</button>"
+				applicationJs = applicationJs + "document.querySelector('#reset').onclick = function() {    window.close();  };  "
+			};
+			if (document.getElementById('addressBar').checked) {
+				applicationHtml = applicationHtml + "<form id=\"location-form\"><div id=\"center-column\"></div></form>"
+				applicationJs = applicationJs + "document.querySelector('#terminate').onclick = function() {    webview.terminate();  };  document.querySelector('#location-form').onsubmit = function(e) {    e.preventDefault();    navigateTo(document.querySelector('#location').value);  };  "
+			}
+			else {
+				applicationJs = applicationJs + "document.querySelector('#terminate').onclick = function() {    webview.terminate();  };  "
+			};
+			applicationHtml = applicationHtml + "</div><webview src=\"" + appLink + "\" style=\"width:100%; height:100%\"></webview><div id=\"sad-webview\"><div id=\"sad-webview-icon\">&#9762;</div><h2 id=\"crashed-label\">Aw, Snap!</h2><h2 id=\"killed-label\">He's Dead, Jim!</h2><p>Something went wrong while displaying this webpage.      To continue, reload or go to another page.</p></div></body></html>"
+			applicationJs = applicationJs + "webview.addEventListener('exit', handleExit);  webview.addEventListener('loadstart', handleLoadStart);  webview.addEventListener('loadstop', handleLoadStop);  webview.addEventListener('loadabort', handleLoadAbort);  webview.addEventListener('loadredirect', handleLoadRedirect);  webview.addEventListener('loadcommit', handleLoadCommit);};function navigateTo(url) {  resetExitedState();  document.querySelector('webview').src = url;}function doLayout() {  var webview = document.querySelector('webview');  var controls = document.querySelector('#controls');  var controlsHeight = controls.offsetHeight;  var windowWidth = document.documentElement.clientWidth;  var windowHeight = document.documentElement.clientHeight;  var webviewWidth = windowWidth;  var webviewHeight = windowHeight - controlsHeight;  webview.style.width = webviewWidth + 'px';  webview.style.height = webviewHeight + 'px';  var sadWebview = document.querySelector('#sad-webview');  sadWebview.style.width = webviewWidth + 'px';  sadWebview.style.height = webviewHeight * 2/3 + 'px';  sadWebview.style.paddingTop = webviewHeight/3 + 'px';}function handleExit(event) {  console.log(event.type);  document.body.classList.add('exited');  if (event.type == 'abnormal') {    document.body.classList.add('crashed');  } else if (event.type == 'killed') {    document.body.classList.add('killed');  }}function resetExitedState() {  document.body.classList.remove('exited');  document.body.classList.remove('crashed');  document.body.classList.remove('killed');}function handleLoadCommit(event) {  resetExitedState();  if (!event.isTopLevel) {    return;  }  document.querySelector('#location').value = event.url;  var webview = document.querySelector('webview');  document.querySelector('#back').disabled = !webview.canGoBack();  document.querySelector('#forward').disabled = !webview.canGoForward();}function handleLoadStart(event) {  document.body.classList.add('loading');  isLoading = true;  resetExitedState();  if (!event.isTopLevel) {    return;  }  document.querySelector('#location').value = event.url;}function handleLoadStop(event) {isLoading = false;}function handleLoadAbort(event) {  console.log('oadAbort');  console.log('  url: ' + event.url);  console.log('  isTopLevel: ' + event.isTopLevel);  console.log('  type: ' + event.type);}function handleLoadRedirect(event) {  resetExitedState();  if (!event.isTopLevel) {    return;  }  document.querySelector('#location').value = event.newUrl;}"
+		} 
+		else{
+			applicationHtml = "<!DOCTYPE html><html><head><meta charset='utf-8'><title>" + appName + "</title><script src=\"application.js\"></scr" + "ipt><link rel=\"stylesheet\" type=\"text/css\" href=\"application.css\"></head><body><webview id=\"map\" src=\"" + appLink + "\"></webview></body></html>"
+			applicationCss = "webview {height: 100%;width: 100%;}"
+		}
 	}
 	
 	if(document.getElementById("imgId16").src != ""){
@@ -44,7 +82,6 @@ function appGen() {
 		icon128 = e.options[e.selectedIndex].value;
 	}
 
-	backgroundJs = "chrome.app.runtime.onLaunched.addListener(function() {var options = {'id': '" + appName + "','bounds': {'width': 1024,'height': 768}};chrome.app.window.create('application.html', (options));});";
 	//generate zip
 	zip.file("manifest.json", manifestJson);
 	zip.file("application.html", applicationHtml);
@@ -166,6 +203,7 @@ function page_init() {
 	//initialize run button
 	var runButton = document.getElementById("run");
 	runButton.onclick = appGen;
+	
 
 
 	//google analytics stuff
