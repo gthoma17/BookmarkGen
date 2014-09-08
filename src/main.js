@@ -28,7 +28,11 @@ function appGen() {
 		applicationJs = "window.open(\'" + appLink + "\');window.close();"
 	}
 	else{
-		if (document.getElementById('closeButton').checked || document.getElementById('historyButtons').checked || document.getElementById('refreshButton').checked || document.getElementById('addressBar').checked || document.getElementById('homeButton').checked) {
+		console.log(document.getElementById('closeButton').checked);
+		console.log(document.getElementById('historyButtons').checked);
+		console.log(document.getElementById('refreshButton').checked);
+		console.log(document.getElementById('homeButton').checked);
+		if (document.getElementById('closeButton').checked || document.getElementById('historyButtons').checked || document.getElementById('refreshButton').checked || document.getElementById('homeButton').checked) {
 			applicationHtml = "<!DOCTYPE html><html><head><link rel=\"stylesheet\" href=\"application.css\"><script src=\"application.js\"></scr" + "ipt><body><div id=\"controls\">"	
 			applicationCss = "body {  margin: 0;  padding: 0;  font-family: Lucida Grande, Arial, sans-serif;}#controls {  padding: 3px;  border-bottom: solid 1px #ccc;}#controls button,#controls input {  font-size: 14px;  line-height: 24px;  border-radius: 2px;  padding: 0 6px;}button,input[type=\"submit\"],button[disabled]:hover {  border: solid 1px transparent;  background: transparent;}button:hover,input[type=\"submit\"]:hover {  border-color: #ccc;  background: -webkit-linear-gradient(top, #f2f2f2 0%, #cccccc 99%);}/* These glyphs are on the small side, make them look more natural whencompared to the back/forward buttons */#controls #home,#controls #terminate {  font-size: 24px;}#controls #reload {  font-size: 20px;}#location {  border: solid 1px #ccc;  padding: 2px;  width: 100%;  -webkit-box-sizing: border-box;}#controls {  display: -webkit-flex;  -webit-flex-direction: column;}#controls #location-form {  -webkit-flex: 1;  display: -webkit-flex;  -webit-flex-direction: column;}#controls #center-column {  -webkit-flex: 1;}#sad-webview,webview {  position: absolute;  bottom: 0;  left: 0;}/* The reload button turns into a spinning trobber */.loading #reload {  -webkit-animation: spinner-animation .5s infinite linear;  -webkit-transform-origin: 50% 55.5%;}@-webkit-keyframes spinner-animation {  0% { -webkit-transform: rotate(0deg); }  100% {-webkit-transform: rotate(360deg); }} #sad-webview,.exited webview {  visibility: hidden;  visibility: hidden;}.exited #sad-webview {  visibility: visible;  background: #343f51;  text-align: center;  color: #fff;}#sad-webview h2 {  font-size: 14px;}#sad-webview p {  font-size: 11px;}#sad-webview-icon {  font-size: 96px;  margin-bottom: 10px;}/* Variant of the crashed page when the process is intentionally killed (in thatcase we use a different background color and label). */.exited #sad-webview #killed-label {  display: none;}.killed #sad-webview {  background: #393058;}.killed #sad-webview #killed-label {  display: block;}.killed #sad-webview #crashed-label {  display: none;}"
 			applicationJs = "window.onresize = doLayout;var isLoading = false;onload = function() {  var webview = document.querySelector('webview');  doLayout();  "
@@ -48,11 +52,11 @@ function appGen() {
 			if (document.getElementById('closeButton').checked) {
 				applicationHtml = applicationHtml + "<button id=\"reset\">Close</button>"
 				applicationJs = applicationJs + "document.querySelector('#reset').onclick = function() {    window.close();  };  "
-			};
-			if (document.getElementById('addressBar').checked) {
-				applicationHtml = applicationHtml + "<form id=\"location-form\"><div id=\"center-column\"></div></form>"
-				applicationJs = applicationJs + "document.querySelector('#terminate').onclick = function() {    webview.terminate();  };  document.querySelector('#location-form').onsubmit = function(e) {    e.preventDefault();    navigateTo(document.querySelector('#location').value);  };  "
 			}
+			//if (document.getElementById('addressBar').checked) {
+			//	applicationHtml = applicationHtml + "<form id=\"location-form\"><div id=\"center-column\"></div></form>"
+			//	applicationJs = applicationJs + "document.querySelector('#terminate').onclick = function() {    webview.terminate();  };  document.querySelector('#location-form').onsubmit = function(e) {    e.preventDefault();    navigateTo(document.querySelector('#location').value);  };  "
+			//};
 			else {
 				applicationJs = applicationJs + "document.querySelector('#terminate').onclick = function() {    webview.terminate();  };  "
 			};
@@ -203,7 +207,12 @@ function page_init() {
 	//initialize run button
 	var runButton = document.getElementById("run");
 	runButton.onclick = appGen;
-	
+
+	//initialize check boxes
+	document.getElementById('closeButton').checked = false
+	document.getElementById('historyButtons').checked =false
+	document.getElementById('refreshButton').checked = false
+	document.getElementById('homeButton').checked = false
 
 
 	//google analytics stuff
