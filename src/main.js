@@ -28,10 +28,6 @@ function appGen() {
 		applicationJs = "window.open(\'" + appLink + "\');window.close();"
 	}
 	else{
-		console.log(document.getElementById('closeButton').checked);
-		console.log(document.getElementById('historyButtons').checked);
-		console.log(document.getElementById('refreshButton').checked);
-		console.log(document.getElementById('homeButton').checked);
 		if (document.getElementById('closeButton').checked || document.getElementById('historyButtons').checked || document.getElementById('refreshButton').checked || document.getElementById('homeButton').checked) {
 			applicationHtml = "<!DOCTYPE html><html><head><link rel=\"stylesheet\" href=\"application.css\"><script src=\"application.js\"></scr" + "ipt><body><div id=\"controls\">"	
 			applicationCss = "body {  margin: 0;  padding: 0;  font-family: Lucida Grande, Arial, sans-serif;}#controls {  padding: 3px;  border-bottom: solid 1px #ccc;}#controls button,#controls input {  font-size: 14px;  line-height: 24px;  border-radius: 2px;  padding: 0 6px;}button,input[type=\"submit\"],button[disabled]:hover {  border: solid 1px transparent;  background: transparent;}button:hover,input[type=\"submit\"]:hover {  border-color: #ccc;  background: -webkit-linear-gradient(top, #f2f2f2 0%, #cccccc 99%);}/* These glyphs are on the small side, make them look more natural whencompared to the back/forward buttons */#controls #home,#controls #terminate {  font-size: 24px;}#controls #reload {  font-size: 20px;}#location {  border: solid 1px #ccc;  padding: 2px;  width: 100%;  -webkit-box-sizing: border-box;}#controls {  display: -webkit-flex;  -webit-flex-direction: column;}#controls #location-form {  -webkit-flex: 1;  display: -webkit-flex;  -webit-flex-direction: column;}#controls #center-column {  -webkit-flex: 1;}#sad-webview,webview {  position: absolute;  bottom: 0;  left: 0;}/* The reload button turns into a spinning trobber */.loading #reload {  -webkit-animation: spinner-animation .5s infinite linear;  -webkit-transform-origin: 50% 55.5%;}@-webkit-keyframes spinner-animation {  0% { -webkit-transform: rotate(0deg); }  100% {-webkit-transform: rotate(360deg); }} #sad-webview,.exited webview {  visibility: hidden;  visibility: hidden;}.exited #sad-webview {  visibility: visible;  background: #343f51;  text-align: center;  color: #fff;}#sad-webview h2 {  font-size: 14px;}#sad-webview p {  font-size: 11px;}#sad-webview-icon {  font-size: 96px;  margin-bottom: 10px;}/* Variant of the crashed page when the process is intentionally killed (in thatcase we use a different background color and label). */.exited #sad-webview #killed-label {  display: none;}.killed #sad-webview {  background: #393058;}.killed #sad-webview #killed-label {  display: block;}.killed #sad-webview #crashed-label {  display: none;}"
@@ -148,7 +144,7 @@ function fileHandler16 (e) {
 				alert("Error: Small icon must be exactly 16x16");
 			}
 			else{
-				upImg16.src = data;
+				document.getElementById('imgId16').src = data;
 			}
 		}
 		else {
@@ -169,7 +165,7 @@ function fileHandler128 (e) {
 				alert("Error: Large icon must be exactly 128x128");
 			}
 			else{
-				upImg128.src = data;
+				document.getElementById('imgId128').src = data;
 			}
 		}
 		else {
@@ -182,13 +178,11 @@ function page_init() {
 	//post load setup
 	//setup 16x16 image uploader
 	var input16 = document.getElementById('inputId16')
-	var upImg16 = document.getElementById('imgId16');
 	input16.onchange = function (e) {
 	    loadFileFromInput(e.target,'dataurl');
 	};
 	//setup 128x128 image uploader
 	var input128 = document.getElementById('inputId128')
-	var upImg128 = document.getElementById('imgId128');
 	input128.onchange = function (e) {
 	    loadFileFromInput(e.target,'dataurl');
 	};
